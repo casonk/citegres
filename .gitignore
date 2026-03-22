@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Config with secrets
+citegres.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.codex-staging/
+
+# OS
+.DS_Store
+Thumbs.db
