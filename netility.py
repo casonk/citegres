@@ -1,25 +1,27 @@
-'''
-    Author: Cason Konzer
-    Module: netility
-    -- Part of: citegres
-    Developed for: Advance Database Concepts & Applications
+"""
+Author: Cason Konzer
+Module: netility
+-- Part of: citegres
+Developed for: Advance Database Concepts & Applications
 
-    Function: Provides an interface for graph processing and plotting
-    Version: 2.0
-    Dated: December 2, 2023
-'''
+Function: Provides an interface for graph processing and plotting
+Version: 2.0
+Dated: December 2, 2023
+"""
 
 # IMPORTS
 import sys
 import logging
+
 # import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
+
 # from fa2 import ForceAtlas2
 
 # STATIC SET
-logging.basicConfig(stream=sys.stdout, encoding='utf-8', level=logging.INFO)
-pyLogger = logging.getLogger(name='netility_debug')
+logging.basicConfig(stream=sys.stdout, encoding="utf-8", level=logging.INFO)
+pyLogger = logging.getLogger(name="netility_debug")
 
 # forceatlas2 = ForceAtlas2(
 #                         # Behavior alternatives
@@ -42,45 +44,47 @@ pyLogger = logging.getLogger(name='netility_debug')
 #                         # Log
 #                         verbose=True)
 
-plt.style.use('dark_background')
+plt.style.use("dark_background")
 plt.ion()
 
 ## CONDITIONAL IMPORT
 # try:
-#     import cynetworkx as nx                    
+#     import cynetworkx as nx
 # except ImportError:
 #     import networkx as nx
 
 # GLOBAL VARS
-POS_LAYOUT = 'spring'
+POS_LAYOUT = "spring"
+
 
 # CONSTRUCTION DEFS
-def construct_static_layout(G, layout='spring'):
-    '''
+def construct_static_layout(G, layout="spring"):
+    """
     Utility for generating node positioning
-    '''
-    if layout == 'spring':
+    """
+    if layout == "spring":
         pos = nx.spring_layout(G)
-    elif layout == 'fruchterman_reingold':
+    elif layout == "fruchterman_reingold":
         pos = nx.fruchterman_reingold_layout(G)
-    elif layout == 'spiral':
+    elif layout == "spiral":
         pos = nx.spiral_layout
-    elif layout == 'planar':
+    elif layout == "planar":
         pos = nx.planar_layout(G)
-    elif layout == 'shell':
+    elif layout == "shell":
         pos = nx.shell_layout(G)
-    elif layout == 'random':
+    elif layout == "random":
         pos = nx.random_layout(G)
-    elif layout == 'circular':
+    elif layout == "circular":
         pos = nx.circular_layout(G)
-    elif layout == 'spectral':
+    elif layout == "spectral":
         pos = nx.spectral_layout(G)
     return pos
 
+
 def construct_graph_from_df(df, directed=True):
-    '''
+    """
     Utility for graph construction
-    '''
+    """
     if directed:
         G = nx.DiGraph()
     else:
@@ -90,39 +94,63 @@ def construct_graph_from_df(df, directed=True):
     G.add_weighted_edges_from(weighted_edge_list)
     return G
 
+
 # COMPUTING DEF
-def compute_graph_metrics(G, degrees=False, out_degrees=False, in_degrees=True, degree_centralities=False,
-                          closeness_centralities=False, betweenness_centralities=True):
-    '''
+def compute_graph_metrics(
+    G,
+    degrees=False,
+    out_degrees=False,
+    in_degrees=True,
+    degree_centralities=False,
+    closeness_centralities=False,
+    betweenness_centralities=True,
+):
+    """
     Utility for computing common graph metrics
-    '''
+    """
     metrics = {}
     if degrees:
-        metrics['degrees'] = [G.degree(node) for node in G]
+        metrics["degrees"] = [G.degree(node) for node in G]
     if out_degrees:
-        metrics['out_degrees'] = [G.out_degree(node) for node in G]
+        metrics["out_degrees"] = [G.out_degree(node) for node in G]
     if in_degrees:
-        metrics['in_degrees'] = [(G.in_degree(node)) for node in G]
+        metrics["in_degrees"] = [(G.in_degree(node)) for node in G]
     if degree_centralities:
         degree_centrality = nx.in_degree_centrality(G)
-        metrics['degree_centralities'] = [degree_centrality[node] for node in G.nodes()]
+        metrics["degree_centralities"] = [degree_centrality[node] for node in G.nodes()]
     if closeness_centralities:
         closeness_centrality = nx.closeness_centrality(G)
-        metrics['closeness_centralities'] = [closeness_centrality[node] for node in G.nodes()]
+        metrics["closeness_centralities"] = [
+            closeness_centrality[node] for node in G.nodes()
+        ]
     if betweenness_centralities:
         betweenness_centrality = nx.betweenness_centrality(G)
-        metrics['betweenness_centralities'] = [betweenness_centrality[node] for node in G.nodes()]
+        metrics["betweenness_centralities"] = [
+            betweenness_centrality[node] for node in G.nodes()
+        ]
     return metrics
 
-# PLOTTING DEF
-def plot_graph(G, pos, use_labels, alpha, edge_color, width, arrowsize, node_size, node_color, cmap):
-    '''
-    Utility for graph plotting
-    '''
-    if cmap == 'rainbow':
-        cmap = plt.cm.rainbow
-    plt.figure(figsize=(16,9))
-    nx.draw_networkx(G, pos=pos, with_labels=use_labels, alpha=alpha, edge_color=edge_color, width=width, 
-                     arrowsize=arrowsize, node_size=node_size, node_color=node_color, cmap=cmap)
-    return plt.show()
 
+# PLOTTING DEF
+def plot_graph(
+    G, pos, use_labels, alpha, edge_color, width, arrowsize, node_size, node_color, cmap
+):
+    """
+    Utility for graph plotting
+    """
+    if cmap == "rainbow":
+        cmap = plt.cm.rainbow
+    plt.figure(figsize=(16, 9))
+    nx.draw_networkx(
+        G,
+        pos=pos,
+        with_labels=use_labels,
+        alpha=alpha,
+        edge_color=edge_color,
+        width=width,
+        arrowsize=arrowsize,
+        node_size=node_size,
+        node_color=node_color,
+        cmap=cmap,
+    )
+    return plt.show()
