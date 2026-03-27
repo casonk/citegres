@@ -21,3 +21,6 @@ citegres.ini
 # OS
 .DS_Store
 Thumbs.db
+
+# Local agent handoff log
+CHATHISTORY.md

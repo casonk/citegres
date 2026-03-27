@@ -36,3 +36,11 @@ Python GUI application for PostgreSQL database management, developed as an acade
 - `citegres.ini` must remain in `.gitignore` at all times.
 - Do not embed connection strings, passwords, or hostnames in source code.
 - Use `citegres_template.ini` for any config examples in documentation.
+
+## Agent Memory
+
+Use `./CHATHISTORY.md` as the standard local handoff file for this repo.
+
+- It is local-only and gitignored.
+- Read it after `AGENTS.md` when resuming work.
+- Keep entries brief and focused on config handling, database changes, blockers, and next steps.
