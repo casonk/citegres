@@ -39,8 +39,12 @@ Python GUI application for PostgreSQL database management, developed as an acade
 
 ## Agent Memory
 
+Use `./LESSONSLEARNED.md` as the tracked durable lessons file for this repo.
 Use `./CHATHISTORY.md` as the standard local handoff file for this repo.
 
-- It is local-only and gitignored.
-- Read it after `AGENTS.md` when resuming work.
-- Keep entries brief and focused on config handling, database changes, blockers, and next steps.
+- `LESSONSLEARNED.md` is tracked and should capture only reusable lessons.
+- `CHATHISTORY.md` is local-only, gitignored, and should capture transient handoff context.
+- Read `LESSONSLEARNED.md` and `CHATHISTORY.md` after `AGENTS.md` when resuming work.
+- Add durable lessons to `LESSONSLEARNED.md` when they should influence future sessions.
+- Keep transient entries brief and focused on config handling, database changes, blockers, and next steps.
+- Do not record database credentials or connection details in either file.
