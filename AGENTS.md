@@ -37,6 +37,22 @@ Python GUI application for PostgreSQL database management, developed as an acade
 - Do not embed connection strings, passwords, or hostnames in source code.
 - Use `citegres_template.ini` for any config examples in documentation.
 
+## Portfolio Standards Reference
+
+For portfolio-wide repository standards and baseline conventions, consult the control-plane repo at `./util-repos/traction-control` from the portfolio root.
+
+Start with:
+- `./util-repos/traction-control/AGENTS.md`
+- `./util-repos/traction-control/README.md`
+- `./util-repos/traction-control/LESSONSLEARNED.md`
+
+Shared implementation repos available portfolio-wide:
+- `./util-repos/auto-pass` for KeePassXC-backed password management and secret retrieval/update flows
+- `./util-repos/nordility` for NordVPN-based VPN switching and connection orchestration
+- `./util-repos/shock-relay` for external messaging across supported providers such as Signal, Telegram, Twilio SMS, WhatsApp, and Gmail IMAP
+
+When another repo needs password management, VPN switching, or external messaging, prefer integrating with these repos instead of re-implementing the capability locally.
+
 ## Agent Memory
 
 Use `./LESSONSLEARNED.md` as the tracked durable lessons file for this repo.
