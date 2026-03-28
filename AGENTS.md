@@ -6,11 +6,11 @@ Python GUI application for PostgreSQL database management, developed as an acade
 
 ## Repository Layout
 
-- `guitility.py` — Main GUI module (tkinter interface, ~535 lines)
-- `postility.py` — PostgreSQL database operations module (~734 lines)
-- `seleamility.py` — Selection and query building module (~289 lines)
-- `nordility.py` — Data normalization utilities (~110 lines)
-- `netility.py` — Networking utilities (~128 lines)
+- `guitility.py` — tkinter control surface that orchestrates connection state, scraping, import, query execution, and graph actions
+- `postility.py` — Config parsing, PostgreSQL connection lifecycle, schema creation, import pipeline, and resolved query helpers
+- `seleamility.py` — Chrome automation plus DBLP, OpenAlex, and Crossref enrichment flow that produces import-ready DataFrames
+- `nordility.py` — Local NordVPN rotation helper used to spread scraping traffic across DBLP extraction bursts
+- `netility.py` — Citation graph construction, metric computation, and matplotlib visualization helpers
 - `citegres.ini` — Local database config (gitignored — contains credentials)
 - `citegres_template.ini` — Safe config template with placeholders
 - `Report.pdf` — Project report document
@@ -28,6 +28,8 @@ Python GUI application for PostgreSQL database management, developed as an acade
 - **NEVER commit `citegres.ini`** — it is gitignored because it contains database credentials.
 - Use `citegres_template.ini` as the reference for config format.
 - All database connection parameters must come from the config file, never hardcoded.
+- `guitility.py` is the operator-facing coordinator; keep its menu callbacks aligned with helper-module function names and return shapes.
+- `postility.importXML` is the canonical ingest path from enriched search results into the normalized Postgres schema; document or preserve that staging-to-normalized-table flow when changing architecture.
 - Preserve the module naming convention (`*ility.py`).
 - Test database operations against a local PostgreSQL instance before committing.
 
@@ -47,12 +49,12 @@ Start with:
 - `./util-repos/traction-control/LESSONSLEARNED.md`
 
 Shared implementation repos available portfolio-wide:
-- `./util-repos/archility` for architecture inventory, blueprint scaffolding, and architecture-documentation drift checks
+- `./util-repos/archility` for architecture toolchain bootstrap/render orchestration, Graphviz-capable diagram support, deterministic starter scaffolding, agentic architecture authoring, and architecture-documentation drift checks
 - `./util-repos/auto-pass` for KeePassXC-backed password management and secret retrieval/update flows
 - `./util-repos/nordility` for NordVPN-based VPN switching and connection orchestration
 - `./util-repos/shock-relay` for external messaging across supported providers such as Signal, Telegram, Twilio SMS, WhatsApp, and Gmail IMAP
 
-When another repo needs architecture inventory/scaffolding, password management, VPN switching, or external messaging, prefer integrating with these repos instead of re-implementing the capability locally.
+When another repo needs architecture toolchain bootstrap/rendering, architecture inventory/scaffolding, password management, VPN switching, or external messaging, prefer integrating with these repos instead of re-implementing the capability locally.
 
 ## Agent Memory
 

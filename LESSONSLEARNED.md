@@ -12,4 +12,4 @@ Unlike `CHATHISTORY.md`, this file should keep only reusable lessons that should
 
 ## Lessons
 
-- No durable lessons recorded yet.
+- `citegres` is best understood as a scrape-to-schema pipeline: GUI actions produce an enriched DataFrame, `postility.importXML` stages it through `papers_raw`, and normalized citation tables then drive the query and graph views.
