@@ -1,0 +1,9 @@
+@startuml classes_citegres
+set namespaceSeparator none
+class "LoggingCursor" as postility.LoggingCursor {
+  execute(sql, args)
+}
+class "ciTerminalGUI" as guitility.ciTerminalGUI {
+  start()
+}
+@enduml

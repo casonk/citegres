@@ -1,0 +1,18 @@
+@startuml packages_citegres
+set namespaceSeparator none
+package "guitility" as guitility {
+}
+package "netility" as netility {
+}
+package "nordility" as nordility {
+}
+package "postility" as postility {
+}
+package "seleamility" as seleamility {
+}
+guitility --> netility
+guitility --> nordility
+guitility --> postility
+guitility --> seleamility
+seleamility --> nordility
+@enduml
