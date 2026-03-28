@@ -1,0 +1,44 @@
+@startuml
+!pragma layout smetana
+title citegres Repository Architecture
+skinparam shadowing false
+skinparam defaultFontName Monospace
+
+file "citegres_template.ini\ntracked config contract" as template #E2E8F0
+file "citegres.ini\nlocal credentials by DB section" as config #FCE7F3
+database "DBLP search + XML API" as dblp #FCE7F3
+database "OpenAlex API" as openalex #FCE7F3
+database "Crossref API" as crossref #FCE7F3
+database "PostgreSQL database" as postgres #FCE7F3
+folder "Enriched pandas DataFrame\nand local __df.pkl snapshot" as dataframe #FCE7F3
+
+rectangle "guitility.py\nciTerminalGUI\ntkinter operator console" as gui #DBEAFE
+rectangle "seleamility.py\nChrome automation\nand enrichment pipeline" as scrape #FEF3C7
+rectangle "nordility.py\noptional VPN rotation\nduring scrape bursts" as vpn #FEF3C7
+rectangle "postility.py\nconfig, connections,\nschema, import, and queries" as db_layer #DCFCE7
+rectangle "Schema lifecycle\npapers_raw staging -> normalized tables\nauthors, papers, concepts,\nopenalex, supports, citations,\npaper_concepts" as schema #DCFCE7
+rectangle "netility.py\nNetworkX graph building,\nmetrics, and plotting" as graph #E0F2FE
+rectangle "GUI results pane\nand graph windows" as output #E0F2FE
+
+template --> config : copy and fill locally
+config --> db_layer : selected DB section
+db_layer --> postgres : connect and transact
+db_layer --> schema : initialize and populate
+
+gui --> scrape : DBLP search, XML, extract
+gui --> db_layer : connect, import, select
+gui --> graph : build metrics and plots
+gui --> output : display table results
+
+scrape --> dblp : search results and record pages
+scrape --> openalex : work metadata and concepts
+scrape --> crossref : publisher and reference metadata
+vpn --> scrape : rotate endpoints between batches
+scrape --> dataframe : build import-ready frame
+gui --> dataframe : retain current search results
+
+dataframe --> db_layer : importXML(df)
+db_layer --> output : resolved query tables
+db_layer --> graph : citation edgelists
+graph --> output : metric tables and plots
+@enduml
