@@ -1,15 +1,12 @@
 @startuml packages_citegres
 set namespaceSeparator none
-package "guitility" as guitility {
-}
-package "netility" as netility {
-}
-package "nordility" as nordility {
-}
-package "postility" as postility {
-}
-package "seleamility" as seleamility {
-}
+top to bottom direction
+skinparam componentStyle rectangle
+rectangle "guitility\n1 python file" as guitility
+rectangle "netility\n1 python file" as netility
+rectangle "nordility\n1 python file" as nordility
+rectangle "postility\n1 python file" as postility
+rectangle "seleamility\n1 python file" as seleamility
 guitility --> netility
 guitility --> nordility
 guitility --> postility
