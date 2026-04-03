@@ -10,11 +10,12 @@ Dated: December 2, 2023
 """
 
 # IMPORTS
-import time
-import subprocess
-import numpy as np
 import logging
+import subprocess
 import sys
+import time
+
+import numpy as np
 
 # STATIC SET
 logging.basicConfig(stream=sys.stdout, encoding="utf-8", level=logging.INFO)
@@ -122,7 +123,7 @@ def connect_vpn_server(status=True):
         if status:
             return "VPN Connected"
     except Exception as E:
-        pyLogger.error("%s \nexception in connect_vpn_server" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in connect_vpn_server")
         if status:
             return "VPN Failed to Connect"
 
@@ -137,7 +138,7 @@ def disconnect_vpn_server(status=True):
         if status:
             return "VPN Disconnected"
     except Exception as E:
-        pyLogger.error("%s \nexception in disconnect_vpn_server" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in disconnect_vpn_server")
         if status:
             return "VPN Failed to Disconnect"
 
@@ -148,21 +149,17 @@ def change_vpn_server(speed="fast", fast_reset=10, default_reset=30, status=True
     """
     try:
         if speed == "fast":
-            GROUP = NORDVPN_GROUP_LIST_FAST[
-                np.random.randint(0, len(NORDVPN_GROUP_LIST_FAST) - 1)
-            ]
+            GROUP = NORDVPN_GROUP_LIST_FAST[np.random.randint(0, len(NORDVPN_GROUP_LIST_FAST) - 1)]
             subprocess.Popen(f'{NORDVPN_EXE_PATH} -c -g "{GROUP}"')
             time.sleep(fast_reset)
         else:
-            GROUP = NORDVPN_GROUP_LIST_FULL[
-                np.random.randint(0, len(NORDVPN_GROUP_LIST_FULL) - 1)
-            ]
+            GROUP = NORDVPN_GROUP_LIST_FULL[np.random.randint(0, len(NORDVPN_GROUP_LIST_FULL) - 1)]
             subprocess.Popen(f'{NORDVPN_EXE_PATH} -c -g "{GROUP}"')
             time.sleep(default_reset)
-        pyLogger.info("VPN Redirected to %s" % GROUP)
+        pyLogger.info(f"VPN Redirected to {GROUP}")
         if status:
             return f"VPN Connection Successfully Redirected to {GROUP}"
     except Exception as E:
-        pyLogger.error("%s \nexception in change_vpn_server" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in change_vpn_server")
         if status:
             return f"VPN Connection Failed to Redirect to {GROUP}"

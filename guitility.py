@@ -10,21 +10,22 @@ Dated: December 2, 2023
 """
 
 # IMPORTS
+import sys
+import tkinter as tk
+from tkinter import font
+
+import pandas as pd
+
+import netility
+import nordility
 import postility
 import seleamility
-import nordility
-import netility
-import tkinter as tk
-import pandas as pd
-import sys
-
-from tkinter import font
 
 # STATIC SET
 sys.setrecursionlimit(15000)
 
 
-class ciTerminalGUI(object):
+class ciTerminalGUI:
     def __BD(self):
         return 5
 
@@ -51,19 +52,13 @@ class ciTerminalGUI(object):
         citegresMenu.add_command(label="Connect", command=self.__citegresConnect)
         citegresMenu.add_command(label="Disconnect", command=self.__citegresDisconnect)
         citegresMenu.add_command(label="Reconnect", command=self.__citegresReconnect)
-        citegresMenu.add_command(
-            label="Implant Schema", command=self.__citegresImplantSchema
-        )
+        citegresMenu.add_command(label="Implant Schema", command=self.__citegresImplantSchema)
         citegresDefaultDbMenu = tk.Menu(citegresMenu, tearoff=0)
-        citegresDefaultDbMenu.add_command(
-            label="CiteGres", command=self.__citegresSetCiteGresDB
-        )
+        citegresDefaultDbMenu.add_command(label="CiteGres", command=self.__citegresSetCiteGresDB)
         citegresDefaultDbMenu.add_command(
             label="citegrestmp", command=self.__citegresSetCiteGresTmpDB
         )
-        citegresDefaultDbMenu.add_command(
-            label="databases", command=self.__citegresSetDatabasesDB
-        )
+        citegresDefaultDbMenu.add_command(label="databases", command=self.__citegresSetDatabasesDB)
         citegresDefaultDbMenu.add_command(
             label="networking", command=self.__citegresSetNetworkingDB
         )
@@ -91,9 +86,7 @@ class ciTerminalGUI(object):
         searchLabelFrame.pack(side=tk.TOP, fill=tk.X, expand=tk.YES)
         separatorSearchLabelFrame = tk.Frame(searchLabelFrame, bd=self.__BD())
         separatorSearchLabelFrame.pack(fill=tk.X, expand=tk.YES)
-        searchEntry = tk.Entry(
-            separatorSearchLabelFrame, textvariable=self.__searchQuery
-        )
+        searchEntry = tk.Entry(separatorSearchLabelFrame, textvariable=self.__searchQuery)
         searchEntry.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES)
         basicSearchButton = tk.Button(
             separatorSearchLabelFrame, text="SEARCH", command=self.__dblpQuery
@@ -129,9 +122,7 @@ class ciTerminalGUI(object):
         ### CHROME
         chromeStatusLabelFrame = tk.LabelFrame(statusFrame, text="Chrome Status:")
         chromeStatusLabelFrame.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES)
-        separatorChromeStatusLabelFrame = tk.Frame(
-            chromeStatusLabelFrame, bd=self.__BD()
-        )
+        separatorChromeStatusLabelFrame = tk.Frame(chromeStatusLabelFrame, bd=self.__BD())
         separatorChromeStatusLabelFrame.pack(fill=tk.X, expand=tk.YES)
         self.__chromeField = tk.Text(
             separatorChromeStatusLabelFrame, state=tk.DISABLED, width=22, height=5
@@ -145,9 +136,7 @@ class ciTerminalGUI(object):
         ### CITEGRES
         citegresStatusLabelFrame = tk.LabelFrame(statusFrame, text="Citegres Status:")
         citegresStatusLabelFrame.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES)
-        separatorCitegresStatusLabelFrame = tk.Frame(
-            citegresStatusLabelFrame, bd=self.__BD()
-        )
+        separatorCitegresStatusLabelFrame = tk.Frame(citegresStatusLabelFrame, bd=self.__BD())
         separatorCitegresStatusLabelFrame.pack(fill=tk.X, expand=tk.YES)
         self.__citegresField = tk.Text(
             separatorCitegresStatusLabelFrame, state=tk.DISABLED, width=22, height=5
@@ -173,15 +162,11 @@ class ciTerminalGUI(object):
         #### RESULTS TEXT
         resultsTextLabelFrame = tk.LabelFrame(resultsFrame, text="Results:")
         resultsTextLabelFrame.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES)
-        separatorResultsTextLabelFrame = tk.LabelFrame(
-            resultsTextLabelFrame, bd=self.__BD()
-        )
+        separatorResultsTextLabelFrame = tk.LabelFrame(resultsTextLabelFrame, bd=self.__BD())
         separatorResultsTextLabelFrame.pack(fill=tk.BOTH, expand=tk.YES)
 
         ##### RESULTS TEXT FONT
-        resultsFontButtonFrame = tk.Frame(
-            separatorResultsTextLabelFrame, width=self.__BD()
-        )
+        resultsFontButtonFrame = tk.Frame(separatorResultsTextLabelFrame, width=self.__BD())
         resultsFontButtonFrame.pack(side=tk.TOP)
         resultsFontDecreaseButton = tk.Button(
             resultsFontButtonFrame,
@@ -225,13 +210,9 @@ class ciTerminalGUI(object):
         separatorQueryLabelFrame.pack(fill=tk.X, expand=tk.NO)
 
         #### DBLP
-        queryDBLPLabelFrame = tk.LabelFrame(
-            separatorQueryLabelFrame, text="DBLP Import:"
-        )
+        queryDBLPLabelFrame = tk.LabelFrame(separatorQueryLabelFrame, text="DBLP Import:")
         queryDBLPLabelFrame.pack(side=tk.TOP, fill=tk.X, expand=tk.NO)
-        separatorQueryDBLPLabelFrame = tk.LabelFrame(
-            queryDBLPLabelFrame, bd=self.__BD()
-        )
+        separatorQueryDBLPLabelFrame = tk.LabelFrame(queryDBLPLabelFrame, bd=self.__BD())
         separatorQueryDBLPLabelFrame.pack(fill=tk.X, expand=tk.NO)
         queryExtractExplodedXmlButton = tk.Button(
             separatorQueryDBLPLabelFrame,
@@ -247,13 +228,9 @@ class ciTerminalGUI(object):
         queryImportXmlButton.pack(side=tk.TOP, fill=tk.X)
 
         #### AUTHORS
-        queryAuthorsLabelFrame = tk.LabelFrame(
-            separatorQueryLabelFrame, text="Authors:"
-        )
+        queryAuthorsLabelFrame = tk.LabelFrame(separatorQueryLabelFrame, text="Authors:")
         queryAuthorsLabelFrame.pack(side=tk.TOP, fill=tk.X, expand=tk.NO)
-        separatorQueryAuthorsLabelFrame = tk.LabelFrame(
-            queryAuthorsLabelFrame, bd=self.__BD()
-        )
+        separatorQueryAuthorsLabelFrame = tk.LabelFrame(queryAuthorsLabelFrame, bd=self.__BD())
         separatorQueryAuthorsLabelFrame.pack(fill=tk.X, expand=tk.NO)
         queryGetAuthorsAuthorsButton = tk.Button(
             separatorQueryAuthorsLabelFrame,
@@ -275,13 +252,9 @@ class ciTerminalGUI(object):
         queryGetSupportsAuthorsResolvedButton.pack(side=tk.TOP, fill=tk.X)
 
         #### CONCEPTS
-        queryConceptsLabelFrame = tk.LabelFrame(
-            separatorQueryLabelFrame, text="Concepts:"
-        )
+        queryConceptsLabelFrame = tk.LabelFrame(separatorQueryLabelFrame, text="Concepts:")
         queryConceptsLabelFrame.pack(side=tk.TOP, fill=tk.X, expand=tk.NO)
-        separatorQueryConceptsLabelFrame = tk.LabelFrame(
-            queryConceptsLabelFrame, bd=self.__BD()
-        )
+        separatorQueryConceptsLabelFrame = tk.LabelFrame(queryConceptsLabelFrame, bd=self.__BD())
         separatorQueryConceptsLabelFrame.pack(fill=tk.X, expand=tk.NO)
         queryGetConceptsConceptsButton = tk.Button(
             separatorQueryConceptsLabelFrame,
@@ -303,13 +276,9 @@ class ciTerminalGUI(object):
         queryGetSupportsConceptsResolvedButton.pack(side=tk.TOP, fill=tk.X)
 
         #### EDGELISTS
-        queryEdgelistLabelFrame = tk.LabelFrame(
-            separatorQueryLabelFrame, text="Edgelists:"
-        )
+        queryEdgelistLabelFrame = tk.LabelFrame(separatorQueryLabelFrame, text="Edgelists:")
         queryEdgelistLabelFrame.pack(side=tk.TOP, fill=tk.X, expand=tk.NO)
-        separatorQueryEdgelistLabelFrame = tk.LabelFrame(
-            queryEdgelistLabelFrame, bd=self.__BD()
-        )
+        separatorQueryEdgelistLabelFrame = tk.LabelFrame(queryEdgelistLabelFrame, bd=self.__BD())
         separatorQueryEdgelistLabelFrame.pack(fill=tk.X, expand=tk.NO)
         queryGetOpenalexIdEdgelistButton = tk.Button(
             separatorQueryEdgelistLabelFrame,
@@ -337,17 +306,13 @@ class ciTerminalGUI(object):
         queryGetOpenalexAuthorEdgelistButton.pack(side=tk.TOP, fill=tk.X)
 
         ### BOTTOM RIGHT QUERIES-NETWORKING SEPARATOR
-        bottomRightQueriesNetworkingSeparatorFrame = tk.Frame(
-            bottomRightFrame, width=self.__BD()
-        )
+        bottomRightQueriesNetworkingSeparatorFrame = tk.Frame(bottomRightFrame, width=self.__BD())
         bottomRightQueriesNetworkingSeparatorFrame.pack(side=tk.TOP)
 
         ### NETWORKING
         networkingLabelFrame = tk.LabelFrame(bottomRightFrame, text="Networking:")
         networkingLabelFrame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=tk.NO)
-        separatorNetworkingLabelFrame = tk.LabelFrame(
-            networkingLabelFrame, bd=self.__BD()
-        )
+        separatorNetworkingLabelFrame = tk.LabelFrame(networkingLabelFrame, bd=self.__BD())
         separatorNetworkingLabelFrame.pack(fill=tk.X, expand=tk.NO)
         networkingAuthorCitationButton = tk.Button(
             separatorNetworkingLabelFrame,
@@ -478,14 +443,10 @@ class ciTerminalGUI(object):
         self.__citegresField.insert(index="0.0", chars=status)
         if self.__citegresStatus.get():
             self.__citegresField.tag_add("here", "1.0", "100.10")
-            self.__citegresField.tag_config(
-                "here", background="green", foreground="blue"
-            )
+            self.__citegresField.tag_config("here", background="green", foreground="blue")
         else:
             self.__citegresField.tag_add("here", "1.0", "100.10")
-            self.__citegresField.tag_config(
-                "here", background="red", foreground="yellow"
-            )
+            self.__citegresField.tag_config("here", background="red", foreground="yellow")
         self.__citegresField.config(state=tk.DISABLED)
 
     def __citegresConnect(self):
@@ -603,23 +564,19 @@ class ciTerminalGUI(object):
             cur=self.__citegresCur, conn=self.__citegresConn, df=self.__df
         )
         # TRUNCATE may combine DROP & CREATE to keep a table and delete all of it's data... should be faster
-        status = f"XML search has been imported into Citegres, see console for logs..."
+        status = "XML search has been imported into Citegres, see console for logs..."
         self.__setResultsField(status)
 
     ### AUTHORS
     def __citegresGetAuthorsAuthors(self):
-        (self.__citegresCur, self.__citegresConn), status = (
-            postility.select_all_from_authors(
-                cur=self.__citegresCur, conn=self.__citegresConn
-            )
+        (self.__citegresCur, self.__citegresConn), status = postility.select_all_from_authors(
+            cur=self.__citegresCur, conn=self.__citegresConn
         )
         self.__setResultsField(status.to_string())
 
     def __citegresGetSupportsAuthorsIds(self):
-        (self.__citegresCur, self.__citegresConn), status = (
-            postility.select_all_from_supports(
-                cur=self.__citegresCur, conn=self.__citegresConn
-            )
+        (self.__citegresCur, self.__citegresConn), status = postility.select_all_from_supports(
+            cur=self.__citegresCur, conn=self.__citegresConn
         )
         self.__setResultsField(status.to_string())
 
@@ -633,10 +590,8 @@ class ciTerminalGUI(object):
 
     ### CONCEPTS
     def __citegresConceptsConcepts(self):
-        (self.__citegresCur, self.__citegresConn), status = (
-            postility.select_all_from_concepts(
-                cur=self.__citegresCur, conn=self.__citegresConn
-            )
+        (self.__citegresCur, self.__citegresConn), status = postility.select_all_from_concepts(
+            cur=self.__citegresCur, conn=self.__citegresConn
         )
         self.__setResultsField(status.to_string())
 
@@ -658,10 +613,8 @@ class ciTerminalGUI(object):
 
     ### EDGELISTS
     def __citegresGetOpenalexIdEdgelist(self):
-        (self.__citegresCur, self.__citegresConn), status = (
-            postility.select_all_from_citations(
-                cur=self.__citegresCur, conn=self.__citegresConn
-            )
+        (self.__citegresCur, self.__citegresConn), status = postility.select_all_from_citations(
+            cur=self.__citegresCur, conn=self.__citegresConn
         )
         self.__setResultsField(status.to_string())
 
@@ -768,13 +721,9 @@ class ciTerminalGUI(object):
         topFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
         ### GRAPH CONFIGURATOR
-        graphConfiguratorLabelFrame = tk.LabelFrame(
-            topFrame, text="Graph Configuration:"
-        )
+        graphConfiguratorLabelFrame = tk.LabelFrame(topFrame, text="Graph Configuration:")
         graphConfiguratorLabelFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
-        separatorGraphConfigurator = tk.Frame(
-            graphConfiguratorLabelFrame, bd=self.__BD()
-        )
+        separatorGraphConfigurator = tk.Frame(graphConfiguratorLabelFrame, bd=self.__BD())
         separatorGraphConfigurator.pack(fill=tk.BOTH, expand=tk.YES)
         configurationIncreaseAlphaButton = tk.Button(
             separatorGraphConfigurator,

@@ -10,12 +10,13 @@ Dated: December 2, 2023
 """
 
 # IMPORTS
+import logging
+import sys
 from configparser import ConfigParser
+
 import pandas as pd
 import psycopg2
 import psycopg2.extensions
-import logging
-import sys
 
 # STATIC SET (LOGGER)
 logging.basicConfig(stream=sys.stdout, encoding="utf-8", level=logging.INFO)
@@ -37,12 +38,12 @@ class LoggingCursor(psycopg2.extensions.cursor):
 
     def execute(self, sql, args=None):
         logger = logging.getLogger(name="sql_cursor_debug")
-        logger.info("Execute: %s" % self.mogrify(sql, args))
+        logger.info(f"Execute: {self.mogrify(sql, args)}")
         try:
             psycopg2.extensions.cursor.execute(self, sql, args)
-            logger.info("Status: %s" % self.statusmessage)
+            logger.info(f"Status: {self.statusmessage}")
         except Exception as exc:
-            logger.error("%s: %s" % (exc.__class__.__name__, exc))
+            logger.error(f"{exc.__class__.__name__}: {exc}")
             raise
 
 
@@ -81,7 +82,7 @@ def db_init(cur, conn):
         try:
             cur.execute(__statement)
         except Exception as E:
-            pyLogger.error("%s \nexception in db_init" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in db_init")
     return commit_prior(cur, conn)
 
 
@@ -101,7 +102,7 @@ def clear_papers_raw(
         try:
             cur.execute(__statement)
         except Exception as E:
-            pyLogger.error("%s \nexception in clear_papers_raw" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in clear_papers_raw")
     return commit_prior(cur, conn)
 
 
@@ -125,9 +126,9 @@ def config(filename=f"{SRC}/citegres.ini"):
         params = parser.items(DB_SELECTION)
         for param in params:
             db[param[0]] = param[1]
-        pyLogger.info("Config set from: %s" % DB_SELECTION)
+        pyLogger.info(f"Config set from: {DB_SELECTION}")
     except Exception as E:
-        pyLogger.error("%s \nexception in config" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in config")
     return db
 
 
@@ -139,10 +140,10 @@ def create_connection():
     try:
         conn = psycopg2.connect(**params)
         cur = conn.cursor(cursor_factory=LoggingCursor)
-        pyLogger.info("connected with dsn: %s" % str(conn.dsn))
-        pyLogger.info("connection status: %s" % str(conn.status))
+        pyLogger.info(f"connected with dsn: {str(conn.dsn)}")
+        pyLogger.info(f"connection status: {str(conn.status)}")
     except Exception as E:
-        pyLogger.error("%s \nexception in create_connection" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in create_connection")
     return cur, conn
 
 
@@ -172,7 +173,7 @@ def commit_prior(cur, conn):
         pyLogger.info("transaction(s) committed")
         return cur, conn
     except Exception as E:
-        pyLogger.error("%s \ntransaction(s) rolled back" % str(E))
+        pyLogger.error(f"{str(E)} \ntransaction(s) rolled back")
         conn.rollback()
         return reset_connection(cur=cur, conn=conn)
 
@@ -187,7 +188,7 @@ def commit_transaction(cur, conn, transaction):
         pyLogger.info("transaction committed")
         return cur, conn
     except Exception as E:
-        pyLogger.error("%s \ntransaction rolled back" % str(E))
+        pyLogger.error(f"{str(E)} \ntransaction rolled back")
         conn.rollback()
         return reset_connection(cur=cur, conn=conn)
 
@@ -219,14 +220,12 @@ def insert_authors(cur, conn, df):
         for author in authors:
             all_authors.append(author)
     all_authors = pd.Series(all_authors)
-    for author in all_authors[
-        ~all_authors.isin(values=current_authors.author)
-    ].unique():
+    for author in all_authors[~all_authors.isin(values=current_authors.author)].unique():
         insert_statement = __insert_author.format(author)
         try:
             cur.execute(format_null_insert(__statement=insert_statement))
         except Exception as E:
-            pyLogger.error("%s \nexception in insert_authors" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in insert_authors")
             break
     return commit_prior(cur=cur, conn=conn)
 
@@ -250,14 +249,12 @@ def insert_concepts(cur, conn, df):
         for concept in concepts:
             all_concepts.append(concept)
     all_concepts = pd.Series(all_concepts)
-    for concept in all_concepts[
-        ~all_concepts.isin(values=current_concepts.concept)
-    ].unique():
+    for concept in all_concepts[~all_concepts.isin(values=current_concepts.concept)].unique():
         insert_statement = __insert_concept.format(concept)
         try:
             cur.execute(format_null_insert(__statement=insert_statement))
         except Exception as E:
-            pyLogger.error("%s \nexception in insert_concepts" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in insert_concepts")
             break
     return commit_prior(cur=cur, conn=conn)
 
@@ -271,9 +268,7 @@ def insert_openalexs(cur, conn, df):
     """
     Insert all openalex urls from passed df into database
     """
-    (cur, conn), current_openalex_urls = select_openalex_url_from_openalex(
-        cur=cur, conn=conn
-    )
+    (cur, conn), current_openalex_urls = select_openalex_url_from_openalex(cur=cur, conn=conn)
     if current_openalex_urls is ERROR_FAILED_TO_EXECUTE:
         logging.error(ERROR_FAILED_TO_EXECUTE)
         return commit_prior(cur=cur, conn=conn)
@@ -291,7 +286,7 @@ def insert_openalexs(cur, conn, df):
         try:
             cur.execute(format_null_insert(__statement=insert_statement))
         except Exception as E:
-            pyLogger.error("%s \nexception in insert_openalexs" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in insert_openalexs")
             break
     return commit_prior(cur=cur, conn=conn)
 
@@ -331,7 +326,7 @@ def insert_papers_raw(cur, conn, df):
         try:
             cur.execute(format_null_insert(__statement=insert_statement))
         except Exception as E:
-            pyLogger.error("%s \nexception in insert_papers_raw" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in insert_papers_raw")
             break
     return commit_prior(cur=cur, conn=conn)
 
@@ -357,7 +352,7 @@ def papers_raw_to_papers(cur, conn):
         try:
             cur.execute(__statement)
         except Exception as E:
-            pyLogger.error("%s \nexception in papers_raw_to_papers" % str(E))
+            pyLogger.error(f"{str(E)} \nexception in papers_raw_to_papers")
     return clear_papers_raw(cur=cur, conn=conn)
 
 
@@ -392,15 +387,14 @@ def insert_supports(cur, conn, df):
                     continue
                 paper_ids.append(paper_id)
                 author_ids.append(author_id)
-    for paper_id, author_id in set(zip(paper_ids, author_ids)):
+    for paper_id, author_id in set(zip(paper_ids, author_ids, strict=False)):
         if ~(
-            (current_supports.paper_id == paper_id)
-            & (current_supports.author_id == author_id)
+            (current_supports.paper_id == paper_id) & (current_supports.author_id == author_id)
         ).any():
             try:
                 cur.execute(__insert_support.format(paper_id, author_id))
             except Exception as E:
-                pyLogger.error("%s \nexception in insert_supports" % str(E))
+                pyLogger.error(f"{str(E)} \nexception in insert_supports")
     return commit_prior(cur=cur, conn=conn)
 
 
@@ -413,9 +407,7 @@ def insert_paper_concepts(cur, conn, df):
     """
     Insert all paper-concept pairs from passed df into database
     """
-    (cur, conn), current_paper_concepts = select_all_from_paper_concepts(
-        cur=cur, conn=conn
-    )
+    (cur, conn), current_paper_concepts = select_all_from_paper_concepts(cur=cur, conn=conn)
     paper_ids = []
     concept_ids = []
     for row in df[["title", "concepts"]][(df.concepts != "NULL")].values:
@@ -437,7 +429,7 @@ def insert_paper_concepts(cur, conn, df):
                     continue
                 paper_ids.append(paper_id)
                 concept_ids.append(concept_id)
-    for paper_id, concept_id in set(zip(paper_ids, concept_ids)):
+    for paper_id, concept_id in set(zip(paper_ids, concept_ids, strict=False)):
         if ~(
             (current_paper_concepts.paper == paper_id)
             & (current_paper_concepts.concept == concept_id)
@@ -445,7 +437,7 @@ def insert_paper_concepts(cur, conn, df):
             try:
                 cur.execute(__insert_paper_concept.format(paper_id, concept_id))
             except Exception as E:
-                pyLogger.error("%s \nexception in insert_paper_concepts" % str(E))
+                pyLogger.error(f"{str(E)} \nexception in insert_paper_concepts")
     return commit_prior(cur=cur, conn=conn)
 
 
@@ -482,14 +474,12 @@ def insert_citations(cur, conn, df):
                     continue
                 sources.append(source)
                 targets.append(target)
-    for source, target in set(zip(sources, targets)):
-        if ~(
-            (current_citations.source == source) & (current_citations.target == target)
-        ).any():
+    for source, target in set(zip(sources, targets, strict=False)):
+        if ~((current_citations.source == source) & (current_citations.target == target)).any():
             try:
                 cur.execute(__insert_citation.format(source, target))
             except Exception as E:
-                pyLogger.error("%s \nexception in insert_citations" % str(E))
+                pyLogger.error(f"{str(E)} \nexception in insert_citations")
     return commit_prior(cur=cur, conn=conn)
 
 
@@ -497,9 +487,7 @@ def importXML(cur, conn, df):
     """
     Chain insert & normalization statements to import web scrapped search results into database
     """
-    df.drop_duplicates(
-        subset="title", inplace=True, ignore_index=True
-    )  # remove non-unique titles
+    df.drop_duplicates(subset="title", inplace=True, ignore_index=True)  # remove non-unique titles
     df.title = df.title.str.replace("'", "''")
     df.fillna(value="NULL", inplace=True)
     cur, conn = insert_authors(cur=cur, conn=conn, df=df)
@@ -527,7 +515,7 @@ def select_all_from_authors(cur, conn):
         cur.execute(__query_authorlist_full)
         authorlist_full = pd.DataFrame(cur.fetchall(), columns=["id", "author"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_authors" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_authors")
         authorlist_full = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), authorlist_full
 
@@ -545,7 +533,7 @@ def select_author_from_authors(cur, conn):
         cur.execute(__query_authorlist_author)
         authorlist_author = pd.DataFrame(cur.fetchall(), columns=["author"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_author_from_authors" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_author_from_authors")
         authorlist_author = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), authorlist_author
 
@@ -563,7 +551,7 @@ def select_all_from_concepts(cur, conn):
         cur.execute(__query_conceptlist_full)
         conceptlist_full = pd.DataFrame(cur.fetchall(), columns=["id", "concept"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_concepts" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_concepts")
         conceptlist_full = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), conceptlist_full
 
@@ -581,7 +569,7 @@ def select_concept_from_concepts(cur, conn):
         cur.execute(__query_conceptlist_concept)
         conceptlist_concept = pd.DataFrame(cur.fetchall(), columns=["concept"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_concept_from_concepts" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_concept_from_concepts")
         conceptlist_concept = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), conceptlist_concept
 
@@ -599,7 +587,7 @@ def select_all_from_openalex(cur, conn):
         cur.execute(__query_openalexlist_full)
         openalexlist_full = pd.DataFrame(cur.fetchall(), columns=["id", "openalex_url"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_openalex" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_openalex")
         openalexlist_full = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), openalexlist_full
 
@@ -615,11 +603,9 @@ def select_openalex_url_from_openalex(cur, conn):
     """
     try:
         cur.execute(__query_openalexlist_openalex_url)
-        openalexlist_openalex_url = pd.DataFrame(
-            cur.fetchall(), columns=["openalex_url"]
-        )
+        openalexlist_openalex_url = pd.DataFrame(cur.fetchall(), columns=["openalex_url"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_openalex_url_from_openalex" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_openalex_url_from_openalex")
         openalexlist_openalex_url = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), openalexlist_openalex_url
 
@@ -637,7 +623,7 @@ def select_all_from_citations(cur, conn):
         cur.execute(__query_citationlist_full)
         citationlist_full = pd.DataFrame(cur.fetchall(), columns=["source", "target"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_citations" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_citations")
         citationlist_full = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), citationlist_full
 
@@ -665,9 +651,7 @@ def query_citationlist_full_resolve_openalex(cur, conn):
             cur.fetchall(), columns=["source", "target"]
         )
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in query_citationlist_full_resolve_openalex" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in query_citationlist_full_resolve_openalex")
         citationlist_full_openalex_resolved = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), citationlist_full_openalex_resolved
 
@@ -695,9 +679,7 @@ def query_citationlist_full_resolve_paper_title(cur, conn):
             cur.fetchall(), columns=["source", "target"]
         )
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in query_citationlist_full_resolve_paper_title" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in query_citationlist_full_resolve_paper_title")
         citationlist_full_paper_title_resolved = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), citationlist_full_paper_title_resolved
 
@@ -730,9 +712,7 @@ def query_citationlist_full_resolve_author(cur, conn):
             cur.fetchall(), columns=["source", "target"]
         )
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in query_citationlist_full_resolve_author" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in query_citationlist_full_resolve_author")
         citationlist_full_author_resolved = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), citationlist_full_author_resolved
 
@@ -748,11 +728,9 @@ def select_all_from_supports(cur, conn):
     """
     try:
         cur.execute(__query_supportslist_full)
-        supportlist_full = pd.DataFrame(
-            cur.fetchall(), columns=["paper_id", "author_id"]
-        )
+        supportlist_full = pd.DataFrame(cur.fetchall(), columns=["paper_id", "author_id"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_supports" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_supports")
         supportlist_full = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), supportlist_full
 
@@ -770,11 +748,9 @@ def select_all_from_supports_resolved(cur, conn):
     """
     try:
         cur.execute(__query_supportslist_full_resolved)
-        supportlist_full_resolved = pd.DataFrame(
-            cur.fetchall(), columns=["paper", "author"]
-        )
+        supportlist_full_resolved = pd.DataFrame(cur.fetchall(), columns=["paper", "author"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_supports_resolved" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_supports_resolved")
         supportlist_full_resolved = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), supportlist_full_resolved
 
@@ -790,11 +766,9 @@ def select_all_from_paper_concepts(cur, conn):
     """
     try:
         cur.execute(__query_paperconceptslist_full)
-        paperconceptslist_full = pd.DataFrame(
-            cur.fetchall(), columns=["paper", "concept"]
-        )
+        paperconceptslist_full = pd.DataFrame(cur.fetchall(), columns=["paper", "concept"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_paper_concepts" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_paper_concepts")
         paperconceptslist_full = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), paperconceptslist_full
 
@@ -812,11 +786,9 @@ def select_all_from_paper_concepts_resolved(cur, conn):
     """
     try:
         cur.execute(__query_paperconceptslist_full_resolved)
-        paperconceptslist_full_resolved = pd.DataFrame(
-            cur.fetchall(), columns=["paper", "concept"]
-        )
+        paperconceptslist_full_resolved = pd.DataFrame(cur.fetchall(), columns=["paper", "concept"])
     except Exception as E:
-        pyLogger.error("%s \nexception in select_all_from_paper_concepts" % str(E))
+        pyLogger.error(f"{str(E)} \nexception in select_all_from_paper_concepts")
         paperconceptslist_full_resolved = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), paperconceptslist_full_resolved
 
@@ -836,9 +808,7 @@ def select_id_from_authors_where_author_is(cur, conn, author):
         author_id = cur.fetchone()[0]
         return commit_prior(cur=cur, conn=conn), author_id
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in select_id_from_authors_where_author_is" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in select_id_from_authors_where_author_is")
         cur, conn = commit_prior(cur=cur, conn=conn)
         cur.execute(format_null_insert(__statement=__insert_author.format(author)))
         return select_id_from_authors_where_author_is(cur=cur, conn=conn, author=author)
@@ -857,9 +827,7 @@ def select_id_from_papers_where_title_is(cur, conn, title):
         cur.execute(__select_id_from_papers_where_title_is.format(title))
         paper_id = cur.fetchone()[0]
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in select_id_from_papers_where_title_is" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in select_id_from_papers_where_title_is")
         paper_id = ERROR_FAILED_TO_EXECUTE
     return commit_prior(cur=cur, conn=conn), paper_id
 
@@ -874,19 +842,13 @@ def select_id_from_openalex_where_openalex_url_is(cur, conn, openalex_url):
     Select openalex id for a given url
     """
     try:
-        cur.execute(
-            __select_id_from_openalex_where_openalex_url_is.format(openalex_url)
-        )
+        cur.execute(__select_id_from_openalex_where_openalex_url_is.format(openalex_url))
         openalex_id = cur.fetchone()[0]
         return commit_prior(cur=cur, conn=conn), openalex_id
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in select_id_from_openalex_where_openalex_url_is" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in select_id_from_openalex_where_openalex_url_is")
         cur, conn = commit_prior(cur=cur, conn=conn)
-        cur.execute(
-            format_null_insert(__statement=__insert_openalex.format(openalex_url))
-        )
+        cur.execute(format_null_insert(__statement=__insert_openalex.format(openalex_url)))
         return select_id_from_openalex_where_openalex_url_is(
             cur=cur, conn=conn, openalex_url=openalex_url
         )
@@ -906,11 +868,7 @@ def select_id_from_concepts_where_concept_is(cur, conn, concept):
         concept_id = cur.fetchone()[0]
         return commit_prior(cur=cur, conn=conn), concept_id
     except Exception as E:
-        pyLogger.error(
-            "%s \nexception in select_id_from_concepts_where_concept_is" % str(E)
-        )
+        pyLogger.error(f"{str(E)} \nexception in select_id_from_concepts_where_concept_is")
         cur, conn = commit_prior(cur=cur, conn=conn)
         cur.execute(format_null_insert(__statement=__insert_concept.format(concept)))
-        return select_id_from_concepts_where_concept_is(
-            cur=cur, conn=conn, concept=concept
-        )
+        return select_id_from_concepts_where_concept_is(cur=cur, conn=conn, concept=concept)
