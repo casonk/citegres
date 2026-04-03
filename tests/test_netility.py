@@ -12,7 +12,6 @@ import pytest
 
 import netility
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -28,7 +27,9 @@ def simple_directed_graph():
 @pytest.fixture()
 def edge_df():
     """Two-column DataFrame representing citation pairs."""
-    return pd.DataFrame({"source": ["A", "A", "B", "A"], "target": ["B", "C", "C", "B"]})
+    return pd.DataFrame(
+        {"source": ["A", "A", "B", "A"], "target": ["B", "C", "C", "B"]}
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -73,7 +74,14 @@ class TestConstructGraphFromDf:
 
 
 class TestConstructStaticLayout:
-    LAYOUTS = ["spring", "fruchterman_reingold", "planar", "shell", "random", "circular"]
+    LAYOUTS = [
+        "spring",
+        "fruchterman_reingold",
+        "planar",
+        "shell",
+        "random",
+        "circular",
+    ]
 
     @pytest.mark.parametrize("layout", LAYOUTS)
     def test_layout_returns_dict(self, simple_directed_graph, layout):
@@ -91,7 +99,9 @@ class TestConstructStaticLayout:
 
     def test_spiral_layout_returns_callable(self, simple_directed_graph):
         # spiral branch returns the layout function object, not a dict
-        result = netility.construct_static_layout(simple_directed_graph, layout="spiral")
+        result = netility.construct_static_layout(
+            simple_directed_graph, layout="spiral"
+        )
         assert callable(result)
 
     def test_spectral_layout(self, simple_directed_graph):
@@ -108,7 +118,10 @@ class TestComputeGraphMetrics:
     def test_default_returns_betweenness(self, simple_directed_graph):
         metrics = netility.compute_graph_metrics(simple_directed_graph)
         assert "betweenness_centralities" in metrics
-        assert len(metrics["betweenness_centralities"]) == simple_directed_graph.number_of_nodes()
+        assert (
+            len(metrics["betweenness_centralities"])
+            == simple_directed_graph.number_of_nodes()
+        )
 
     def test_in_degrees(self, simple_directed_graph):
         metrics = netility.compute_graph_metrics(simple_directed_graph, in_degrees=True)
@@ -117,19 +130,26 @@ class TestComputeGraphMetrics:
 
     def test_out_degrees(self, simple_directed_graph):
         metrics = netility.compute_graph_metrics(
-            simple_directed_graph, out_degrees=True, in_degrees=False, betweenness_centralities=False
+            simple_directed_graph,
+            out_degrees=True,
+            in_degrees=False,
+            betweenness_centralities=False,
         )
         assert "out_degrees" in metrics
 
     def test_degree_centralities(self, simple_directed_graph):
         metrics = netility.compute_graph_metrics(
-            simple_directed_graph, degree_centralities=True, betweenness_centralities=False
+            simple_directed_graph,
+            degree_centralities=True,
+            betweenness_centralities=False,
         )
         assert "degree_centralities" in metrics
 
     def test_closeness_centralities(self, simple_directed_graph):
         metrics = netility.compute_graph_metrics(
-            simple_directed_graph, closeness_centralities=True, betweenness_centralities=False
+            simple_directed_graph,
+            closeness_centralities=True,
+            betweenness_centralities=False,
         )
         assert "closeness_centralities" in metrics
 
@@ -185,9 +205,11 @@ class TestPlotGraph:
         import matplotlib.pyplot as mpl_plt
 
         pos = netility.construct_static_layout(simple_directed_graph, layout="circular")
-        with patch("netility.plt.show"), patch("netility.plt.figure"), patch(
-            "netility.nx.draw_networkx"
-        ) as mock_draw:
+        with (
+            patch("netility.plt.show"),
+            patch("netility.plt.figure"),
+            patch("netility.nx.draw_networkx") as mock_draw,
+        ):
             netility.plot_graph(
                 simple_directed_graph,
                 pos=pos,
