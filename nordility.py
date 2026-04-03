@@ -56,7 +56,7 @@ NORDVPN_GROUP_LIST_FULL = [
     "Colombia",
     "Latvia",
     "Sweden",
-    "Costa_Rica" "Lithuania",
+    "Costa_RicaLithuania",
     "Switzerland",
     "Croatia",
     "Luxembourg",
