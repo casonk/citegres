@@ -10,12 +10,13 @@ Dated: December 2, 2023
 """
 
 # IMPORTS
-import sys
 import logging
+import sys
+
+import matplotlib.pyplot as plt
 
 # import pandas as pd
 import networkx as nx
-import matplotlib.pyplot as plt
 
 # from fa2 import ForceAtlas2
 
@@ -120,14 +121,10 @@ def compute_graph_metrics(
         metrics["degree_centralities"] = [degree_centrality[node] for node in G.nodes()]
     if closeness_centralities:
         closeness_centrality = nx.closeness_centrality(G)
-        metrics["closeness_centralities"] = [
-            closeness_centrality[node] for node in G.nodes()
-        ]
+        metrics["closeness_centralities"] = [closeness_centrality[node] for node in G.nodes()]
     if betweenness_centralities:
         betweenness_centrality = nx.betweenness_centrality(G)
-        metrics["betweenness_centralities"] = [
-            betweenness_centrality[node] for node in G.nodes()
-        ]
+        metrics["betweenness_centralities"] = [betweenness_centrality[node] for node in G.nodes()]
     return metrics
 
 
