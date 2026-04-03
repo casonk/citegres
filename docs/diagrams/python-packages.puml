@@ -2,6 +2,7 @@
 set namespaceSeparator none
 top to bottom direction
 skinparam componentStyle rectangle
+rectangle "conftest\n1 python file" as conftest
 rectangle "guitility\n1 python file" as guitility
 rectangle "netility\n1 python file" as netility
 rectangle "nordility\n1 python file" as nordility
