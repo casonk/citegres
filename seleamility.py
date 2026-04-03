@@ -12,12 +12,14 @@ Dated: December 2, 2023
 # IMPORTS
 import re
 import time
-import requests
-import nordility
+
 import pandas as pd
+import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+
+import nordility
 
 # STATIC VARS (PATHS)
 DRIVER_PATH = "S:/Drivers/Chrome/chromedriver-win64/chromedriver.exe"
@@ -109,17 +111,14 @@ def chrome_query_dblp_XML(driver, query="echo chamber"):
     for hit in hits:
         try:
             search_results["authors"] = search_results.get("authors", []) + [
-                [
-                    author.contents[0].replace("'", "''")
-                    for author in hit.authors.children
-                ]
+                [author.contents[0].replace("'", "''") for author in hit.authors.children]
             ]
         except:
             search_results["authors"] = search_results.get("authors", []) + ["NULL"]
         for tag in tags:
             try:
                 val = hit.info.find(tag).contents[0]
-            except Exception as E:
+            except Exception:
                 val = "NULL"
             search_results[tag] = search_results.get(tag, []) + [val]
     return search_results
@@ -169,41 +168,35 @@ def explode_query_dblp(driver, search_results, explosion_factor=10, use_nord=1):
                         .find_all(href=re.compile("https://api.openalex.org/works/"))[0]
                         .get("href")
                     )
-                except Exception as E:
+                except Exception:
                     openalex_stats_url = "NULL"
                 try:
                     crossref_refs_url = (
                         soup.body.find("div", id="publ-references-section")
-                        .div.header.find_all(
-                            href=re.compile("https://api.crossref.org/works/")
-                        )[0]
+                        .div.header.find_all(href=re.compile("https://api.crossref.org/works/"))[0]
                         .get("href")
                     )
-                except Exception as E:
+                except Exception:
                     crossref_refs_url = "NULL"
                 try:
                     opencitations_refs_url = (
                         soup.body.find("div", id="publ-references-section")
                         .div.header.find_all(
-                            href=re.compile(
-                                "https://opencitations.net/index/api/v1/.*json"
-                            )
+                            href=re.compile("https://opencitations.net/index/api/v1/.*json")
                         )[0]
                         .get("href")
                     )
-                except Exception as E:
+                except Exception:
                     opencitations_refs_url = "NULL"
                 try:
                     opencitations_cite_url = (
                         soup.body.find("div", id="publ-citations-section")
                         .div.header.find_all(
-                            href=re.compile(
-                                "https://opencitations.net/index/api/v1/.*json"
-                            )
+                            href=re.compile("https://opencitations.net/index/api/v1/.*json")
                         )[0]
                         .get("href")
                     )
-                except Exception as E:
+                except Exception:
                     opencitations_cite_url = "NULL"
                 try:
                     semanticscholar_refs_url = (
@@ -213,7 +206,7 @@ def explode_query_dblp(driver, search_results, explosion_factor=10, use_nord=1):
                         )[0]
                         .get("href")
                     )
-                except Exception as E:
+                except Exception:
                     semanticscholar_refs_url = "NULL"
                 try:
                     semanticscholar_cite_url = (
@@ -223,7 +216,7 @@ def explode_query_dblp(driver, search_results, explosion_factor=10, use_nord=1):
                         )[0]
                         .get("href")
                     )
-                except Exception as E:
+                except Exception:
                     semanticscholar_cite_url = "NULL"
                 openalex_stats_urls.append(openalex_stats_url)
                 crossref_refs_urls.append(crossref_refs_url)
@@ -256,7 +249,7 @@ def explode_query_dblp(driver, search_results, explosion_factor=10, use_nord=1):
         try:
             r = requests.get(unopenedalex)
             openedalex = r.json()
-        except Exception as E:
+        except Exception:
             openalex_ids.append("NULL")
             publication_dates.append("NULL")
             landing_page_urls.append("NULL")
@@ -270,45 +263,43 @@ def explode_query_dblp(driver, search_results, explosion_factor=10, use_nord=1):
             continue
         try:
             openalex_ids.append(openedalex["id"])
-        except Exception as E:
+        except Exception:
             openalex_ids.append("NULL")
         try:
             publication_dates.append(openedalex["publication_date"])
-        except Exception as E:
+        except Exception:
             publication_dates.append("NULL")
         try:
             landing_page_urls.append(openedalex["primary_location"]["landing_page_url"])
-        except Exception as E:
+        except Exception:
             landing_page_urls.append("NULL")
         try:
             pdf_urls.append(openedalex["primary_location"]["pdf_url"])
-        except Exception as E:
+        except Exception:
             pdf_urls.append("NULL")
         try:
             cited_by_counts.append(openedalex["cited_by_count"])
-        except Exception as E:
+        except Exception:
             cited_by_counts.append("NULL")
         try:
-            concepts.append(
-                [c["display_name"].replace("'", "''") for c in openedalex["concepts"]]
-            )
-        except Exception as E:
+            concepts.append([c["display_name"].replace("'", "''") for c in openedalex["concepts"]])
+        except Exception:
             concepts.append("NULL")
         try:
             referenced_works_counts.append(openedalex["referenced_works_count"])
-        except Exception as E:
+        except Exception:
             referenced_works_counts.append("NULL")
         try:
             referenced_works.append(openedalex["referenced_works"])
-        except Exception as E:
+        except Exception:
             referenced_works.append("NULL")
         try:
             related_works.append(openedalex["related_works"])
-        except Exception as E:
+        except Exception:
             related_works.append("NULL")
         try:
             cited_by_api_urls.append(openedalex["cited_by_api_url"])
-        except Exception as E:
+        except Exception:
             cited_by_api_urls.append("NULL")
     df["openalex_id"] = openalex_ids
     df["publication_date"] = publication_dates
@@ -330,20 +321,20 @@ def explode_query_dblp(driver, search_results, explosion_factor=10, use_nord=1):
             crossreffed = r.json()
             try:
                 publishers.append(crossreffed["message"]["publisher"])
-            except Exception as E:
+            except Exception:
                 publishers.append("NULL")
             try:
                 ref_doi_list = []
                 for ref in crossreffed["message"]["reference"]:
                     try:
                         doi = ref["DOI"]
-                    except Exception as E:
+                    except Exception:
                         doi = "NULL"
                     ref_doi_list.append(doi)
                 ref_doi_lists.append(ref_doi_list)
-            except Exception as E:
+            except Exception:
                 ref_doi_lists.append("NULL")
-        except Exception as E:
+        except Exception:
             publishers.append("NULL")
             ref_doi_lists.append("NULL")
     df["publisher"] = publishers
