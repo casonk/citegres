@@ -39,6 +39,17 @@ Python GUI application for PostgreSQL database management, developed as an acade
 - Do not embed connection strings, passwords, or hostnames in source code.
 - Use `citegres_template.ini` for any config examples in documentation.
 
+## Local CI Verification
+
+Run before every push:
+
+```bash
+pre-commit run --all-files
+pytest -q
+```
+
+Do not push changes that have not passed all checks locally.
+
 ## Portfolio Standards Reference
 
 For portfolio-wide repository standards and baseline conventions, consult the control-plane repo at `./util-repos/traction-control` from the portfolio root.
