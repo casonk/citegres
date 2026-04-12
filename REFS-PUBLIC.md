@@ -1,4 +1,4 @@
-# REFS-PUBLIC.md — Public References
+# REFS-PUBLIC.md - Public References
 
 > Record external public repositories, datasets, documentation, APIs, or other
 > public resources that this repository utilizes or depends on.
@@ -6,22 +6,19 @@
 
 ## Public Repositories
 
-<!-- External repos this project depends on, forks, or integrates with:
-- https://github.com/org/repo — description of usage
--->
+- No fixed external code repository is the main upstream; the repo integrates with public metadata services and PostgreSQL.
 
 ## Public Datasets and APIs
 
-<!-- Publicly accessible data sources, REST APIs, or external feeds consumed here:
-- https://example.com/dataset — description of usage
--->
+- https://dblp.org/ - bibliographic source used during ingestion and enrichment
+- https://api.openalex.org/ - metadata enrichment source for works and authors
+- https://api.crossref.org/ - DOI and citation metadata enrichment source
 
 ## Documentation and Specifications
 
-<!-- Reference docs, RFCs, standards, or upstream project documentation:
-- https://docs.example.com — description
--->
+- https://www.postgresql.org/docs/ - PostgreSQL reference for schema and query behavior
+- https://docs.python.org/3/library/tkinter.html - tkinter GUI reference for the desktop client
 
 ## Notes
 
-<!-- Any context about how these public references are used or versioned -->
+- Local configuration and credentials stay outside git; this file only tracks the public metadata and database references the project depends on.
