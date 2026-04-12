@@ -630,13 +630,13 @@ def select_all_from_citations(cur, conn):
 
 __query_citationlist_full_resolve_openalex = """
 WITH sourced AS (
-    SELECT openalex.openalex_url AS source, citations.target AS target 
-    FROM citations 
-    JOIN openalex 
+    SELECT openalex.openalex_url AS source, citations.target AS target
+    FROM citations
+    JOIN openalex
     ON citations.source = openalex.id)
 SELECT sourced.source AS source, openalex.openalex_url AS target
-FROM sourced 
-JOIN openalex 
+FROM sourced
+JOIN openalex
 ON sourced.target = openalex.id;
 """
 
@@ -658,13 +658,13 @@ def query_citationlist_full_resolve_openalex(cur, conn):
 
 __query_citationlist_full_resolve_paper_title = """
 WITH sourced AS (
-    SELECT papers.title AS source, citations.target AS target 
-    FROM citations 
-    JOIN papers 
+    SELECT papers.title AS source, citations.target AS target
+    FROM citations
+    JOIN papers
     ON citations.source = papers.openalex)
 SELECT sourced.source AS source, papers.title AS target
-FROM sourced 
-JOIN papers 
+FROM sourced
+JOIN papers
 ON sourced.target = papers.openalex;
 """
 
@@ -686,18 +686,18 @@ def query_citationlist_full_resolve_paper_title(cur, conn):
 
 __query_citationlist_full_resolve_author = """
 WITH alex_to_author AS (
-    SELECT papers.openalex AS openalex, authors.author AS author 
+    SELECT papers.openalex AS openalex, authors.author AS author
     FROM papers
-    JOIN authors 
+    JOIN authors
     ON papers.author = authors.id),
 sourced AS (
-    SELECT alex_to_author.author AS source, citations.target AS target 
-    FROM citations 
-    JOIN alex_to_author 
+    SELECT alex_to_author.author AS source, citations.target AS target
+    FROM citations
+    JOIN alex_to_author
     ON citations.source = alex_to_author.openalex)
-SELECT sourced.source AS source, alex_to_author.author AS target 
-FROM sourced 
-JOIN alex_to_author 
+SELECT sourced.source AS source, alex_to_author.author AS target
+FROM sourced
+JOIN alex_to_author
 ON sourced.target = alex_to_author.openalex;
 """
 
