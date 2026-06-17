@@ -113,7 +113,7 @@ def chrome_query_dblp_XML(driver, query="echo chamber"):
             search_results["authors"] = search_results.get("authors", []) + [
                 [author.contents[0].replace("'", "''") for author in hit.authors.children]
             ]
-        except:
+        except Exception:
             search_results["authors"] = search_results.get("authors", []) + ["NULL"]
         for tag in tags:
             try:

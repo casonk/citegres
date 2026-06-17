@@ -1,12 +1,33 @@
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "citegres"
+version = "0.1.0"
+description = "PostgreSQL GUI academic project."
+requires-python = ">=3.10"
+license = { text = "LGPL-2.1" }
+authors = [
+  { name = "Cason Konzer", email = "casonk@umich.edu" },
+]
+dependencies = [
+    "pandas>=1.5.0",
+    "psycopg2-binary>=2.9.0",
+    "networkx",
+    "matplotlib",
+]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8",
+    "ruff",
     "dyno_lab @ git+https://github.com/casonk/dyno-lab.git",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
 
 [tool.black]
 line-length = 100
