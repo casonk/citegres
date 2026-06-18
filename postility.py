@@ -194,15 +194,8 @@ def commit_transaction(cur, conn, transaction):
 
 
 # INSERT DEFS
-def format_null_insert(__statement):
-    """
-    Remove single quotes from NULL strings in execute statements
-    """
-    return __statement.replace("'NULL'", "NULL")
-
-
 __insert_author = """
-INSERT INTO authors (author) VALUES ('{}');
+INSERT INTO authors (author) VALUES (%s);
 """
 
 
@@ -214,16 +207,14 @@ def insert_authors(cur, conn, df):
     if current_authors is ERROR_FAILED_TO_EXECUTE:
         logging.error(ERROR_FAILED_TO_EXECUTE)
         return commit_prior(cur=cur, conn=conn)
-    current_authors.author = current_authors.author.str.replace("'", "''")
     all_authors = []
     for authors in df.authors:
         for author in authors:
             all_authors.append(author)
     all_authors = pd.Series(all_authors)
     for author in all_authors[~all_authors.isin(values=current_authors.author)].unique():
-        insert_statement = __insert_author.format(author)
         try:
-            cur.execute(format_null_insert(__statement=insert_statement))
+            cur.execute(__insert_author, (None if author == "NULL" else author,))
         except Exception as E:
             pyLogger.error(f"{str(E)} \nexception in insert_authors")
             break
@@ -231,7 +222,7 @@ def insert_authors(cur, conn, df):
 
 
 __insert_concept = """
-INSERT INTO concepts (concept) VALUES ('{}');
+INSERT INTO concepts (concept) VALUES (%s);
 """
 
 
@@ -243,16 +234,14 @@ def insert_concepts(cur, conn, df):
     if current_concepts is ERROR_FAILED_TO_EXECUTE:
         logging.error(ERROR_FAILED_TO_EXECUTE)
         return commit_prior(cur=cur, conn=conn)
-    current_concepts.concept = current_concepts.concept.str.replace("'", "''")
     all_concepts = []
     for concepts in df.concepts[df.concepts != "NULL"]:
         for concept in concepts:
             all_concepts.append(concept)
     all_concepts = pd.Series(all_concepts)
     for concept in all_concepts[~all_concepts.isin(values=current_concepts.concept)].unique():
-        insert_statement = __insert_concept.format(concept)
         try:
-            cur.execute(format_null_insert(__statement=insert_statement))
+            cur.execute(__insert_concept, (None if concept == "NULL" else concept,))
         except Exception as E:
             pyLogger.error(f"{str(E)} \nexception in insert_concepts")
             break
@@ -260,7 +249,7 @@ def insert_concepts(cur, conn, df):
 
 
 __insert_openalex = """
-INSERT INTO openalex (openalex_url) VALUES ('{}');
+INSERT INTO openalex (openalex_url) VALUES (%s);
 """
 
 
@@ -282,9 +271,8 @@ def insert_openalexs(cur, conn, df):
     for openalex_url in all_openalex_urls[
         ~all_openalex_urls.isin(values=current_openalex_urls.openalex_url)
     ].unique():
-        insert_statement = __insert_openalex.format(openalex_url)
         try:
-            cur.execute(format_null_insert(__statement=insert_statement))
+            cur.execute(__insert_openalex, (None if openalex_url == "NULL" else openalex_url,))
         except Exception as E:
             pyLogger.error(f"{str(E)} \nexception in insert_openalexs")
             break
@@ -292,7 +280,7 @@ def insert_openalexs(cur, conn, df):
 
 
 __insert_paper_raw = """
-INSERT INTO papers_raw (doi, title, pdate, author, publisher, ptype, venue, openalex) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');
+INSERT INTO papers_raw (doi, title, pdate, author, publisher, ptype, venue, openalex) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
 """
 
 
@@ -320,11 +308,14 @@ def insert_papers_raw(cur, conn, df):
         ptype = row[5]
         venue = row[6]
         openalex = row[7]
-        insert_statement = __insert_paper_raw.format(
-            doi, title, pdate, author, publisher, ptype, venue, openalex
-        )
         try:
-            cur.execute(format_null_insert(__statement=insert_statement))
+            cur.execute(
+                __insert_paper_raw,
+                tuple(
+                    None if v == "NULL" else v
+                    for v in [doi, title, pdate, author, publisher, ptype, venue, openalex]
+                ),
+            )
         except Exception as E:
             pyLogger.error(f"{str(E)} \nexception in insert_papers_raw")
             break
@@ -357,7 +348,7 @@ def papers_raw_to_papers(cur, conn):
 
 
 __insert_support = """
-INSERT INTO supports VALUES ({}, {});
+INSERT INTO supports VALUES (%s, %s);
 """
 
 
@@ -392,14 +383,14 @@ def insert_supports(cur, conn, df):
             (current_supports.paper_id == paper_id) & (current_supports.author_id == author_id)
         ).any():
             try:
-                cur.execute(__insert_support.format(paper_id, author_id))
+                cur.execute(__insert_support, (paper_id, author_id))
             except Exception as E:
                 pyLogger.error(f"{str(E)} \nexception in insert_supports")
     return commit_prior(cur=cur, conn=conn)
 
 
 __insert_paper_concept = """
-INSERT INTO paper_concepts VALUES ({}, {});
+INSERT INTO paper_concepts VALUES (%s, %s);
 """
 
 
@@ -435,14 +426,14 @@ def insert_paper_concepts(cur, conn, df):
             & (current_paper_concepts.concept == concept_id)
         ).any():
             try:
-                cur.execute(__insert_paper_concept.format(paper_id, concept_id))
+                cur.execute(__insert_paper_concept, (paper_id, concept_id))
             except Exception as E:
                 pyLogger.error(f"{str(E)} \nexception in insert_paper_concepts")
     return commit_prior(cur=cur, conn=conn)
 
 
 __insert_citation = """
-INSERT INTO citations VALUES ({}, {});
+INSERT INTO citations VALUES (%s, %s);
 """
 
 
@@ -477,7 +468,7 @@ def insert_citations(cur, conn, df):
     for source, target in set(zip(sources, targets, strict=False)):
         if ~((current_citations.source == source) & (current_citations.target == target)).any():
             try:
-                cur.execute(__insert_citation.format(source, target))
+                cur.execute(__insert_citation, (source, target))
             except Exception as E:
                 pyLogger.error(f"{str(E)} \nexception in insert_citations")
     return commit_prior(cur=cur, conn=conn)
@@ -488,7 +479,6 @@ def importXML(cur, conn, df):
     Chain insert & normalization statements to import web scrapped search results into database
     """
     df.drop_duplicates(subset="title", inplace=True, ignore_index=True)  # remove non-unique titles
-    df.title = df.title.str.replace("'", "''")
     df.fillna(value="NULL", inplace=True)
     cur, conn = insert_authors(cur=cur, conn=conn, df=df)
     cur, conn = insert_concepts(cur=cur, conn=conn, df=df)
@@ -795,7 +785,7 @@ def select_all_from_paper_concepts_resolved(cur, conn):
 
 # SELECT WHERE DEFS
 __select_id_from_authors_where_author_is = """
-SELECT id FROM authors WHERE authors.author = '{}'
+SELECT id FROM authors WHERE authors.author = %s
 """
 
 
@@ -804,18 +794,18 @@ def select_id_from_authors_where_author_is(cur, conn, author):
     Select author id for a given name
     """
     try:
-        cur.execute(__select_id_from_authors_where_author_is.format(author))
+        cur.execute(__select_id_from_authors_where_author_is, (author,))
         author_id = cur.fetchone()[0]
         return commit_prior(cur=cur, conn=conn), author_id
     except Exception as E:
         pyLogger.error(f"{str(E)} \nexception in select_id_from_authors_where_author_is")
         cur, conn = commit_prior(cur=cur, conn=conn)
-        cur.execute(format_null_insert(__statement=__insert_author.format(author)))
+        cur.execute(__insert_author, (None if author == "NULL" else author,))
         return select_id_from_authors_where_author_is(cur=cur, conn=conn, author=author)
 
 
 __select_id_from_papers_where_title_is = """
-SELECT id FROM papers WHERE papers.title = '{}'
+SELECT id FROM papers WHERE papers.title = %s
 """
 
 
@@ -824,7 +814,7 @@ def select_id_from_papers_where_title_is(cur, conn, title):
     Select paper id for a given title
     """
     try:
-        cur.execute(__select_id_from_papers_where_title_is.format(title))
+        cur.execute(__select_id_from_papers_where_title_is, (title,))
         paper_id = cur.fetchone()[0]
     except Exception as E:
         pyLogger.error(f"{str(E)} \nexception in select_id_from_papers_where_title_is")
@@ -833,7 +823,7 @@ def select_id_from_papers_where_title_is(cur, conn, title):
 
 
 __select_id_from_openalex_where_openalex_url_is = """
-SELECT id FROM openalex WHERE openalex.openalex_url = '{}'
+SELECT id FROM openalex WHERE openalex.openalex_url = %s
 """
 
 
@@ -842,20 +832,20 @@ def select_id_from_openalex_where_openalex_url_is(cur, conn, openalex_url):
     Select openalex id for a given url
     """
     try:
-        cur.execute(__select_id_from_openalex_where_openalex_url_is.format(openalex_url))
+        cur.execute(__select_id_from_openalex_where_openalex_url_is, (openalex_url,))
         openalex_id = cur.fetchone()[0]
         return commit_prior(cur=cur, conn=conn), openalex_id
     except Exception as E:
         pyLogger.error(f"{str(E)} \nexception in select_id_from_openalex_where_openalex_url_is")
         cur, conn = commit_prior(cur=cur, conn=conn)
-        cur.execute(format_null_insert(__statement=__insert_openalex.format(openalex_url)))
+        cur.execute(__insert_openalex, (None if openalex_url == "NULL" else openalex_url,))
         return select_id_from_openalex_where_openalex_url_is(
             cur=cur, conn=conn, openalex_url=openalex_url
         )
 
 
 __select_id_from_concepts_where_concept_is = """
-SELECT id FROM concepts WHERE concepts.concept = '{}'
+SELECT id FROM concepts WHERE concepts.concept = %s
 """
 
 
@@ -864,11 +854,11 @@ def select_id_from_concepts_where_concept_is(cur, conn, concept):
     Select concept id for a given concept
     """
     try:
-        cur.execute(__select_id_from_concepts_where_concept_is.format(concept))
+        cur.execute(__select_id_from_concepts_where_concept_is, (concept,))
         concept_id = cur.fetchone()[0]
         return commit_prior(cur=cur, conn=conn), concept_id
     except Exception as E:
         pyLogger.error(f"{str(E)} \nexception in select_id_from_concepts_where_concept_is")
         cur, conn = commit_prior(cur=cur, conn=conn)
-        cur.execute(format_null_insert(__statement=__insert_concept.format(concept)))
+        cur.execute(__insert_concept, (None if concept == "NULL" else concept,))
         return select_id_from_concepts_where_concept_is(cur=cur, conn=conn, concept=concept)
