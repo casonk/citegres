@@ -26,6 +26,7 @@
 - https://pandas.pydata.org/docs/ - pandas DataFrame reference used by ingestion and analysis helpers
 - https://networkx.org/documentation/stable/ - NetworkX graph-analysis reference used by citation-network workflows
 - https://matplotlib.org/stable/contents.html - Matplotlib plotting reference used by analysis and visualization helpers
+- https://www.selenium.dev/documentation/ - Selenium WebDriver reference used by the DBLP browser workflow
 - https://docs.python.org/3/library/tkinter.html - tkinter GUI reference for the desktop client
 
 ## Notes
