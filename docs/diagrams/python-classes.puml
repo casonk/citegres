@@ -1,4 +1,4 @@
-@startuml classes_citegres
+@startuml classes_checkout
 set namespaceSeparator none
 class "LoggingCursor" as postility.LoggingCursor {
   execute(sql, args)
