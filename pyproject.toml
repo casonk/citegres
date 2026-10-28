@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "citegres"
 version = "0.1.0"
 description = "PostgreSQL GUI academic project."
+classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.10"
 license = { text = "LGPL-2.1" }
 authors = [
