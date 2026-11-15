@@ -4,6 +4,7 @@
 [repository]
 # One line shown on GitHub. Keep it free of private repository names and local paths.
 description = "Python tkinter GUI for PostgreSQL citation databases: DBLP scraping, OpenAlex/Crossref enrichment, and citation graphs."
+topics = ["postgresql", "tkinter", "python", "citations", "dblp", "openalex", "crossref"]
 
 [main_branch]
 # Direct commits and pushes to main are refused unless this is true.
